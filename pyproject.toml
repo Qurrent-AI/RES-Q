@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "wheel", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "resq"
+version = "0.0.1"
+description = "Dataset and Submission Interface to accompany the RES-Q paper"
+authors = ["Qurrent AI <team@qurrent.ai>"]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+namespace_packages = true
+ignore_missing_imports = true
+files = [
+    "coder_eval/",
+]
+exclude = [
+    "env/",
+    "tests/",
+    "examples/",
+    "dataset/",
+    "scripts/"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+datasets = "2.18.0"
+aiofiles = "23.2.1"
+types-aiofiles = "23.2.0.20240403"
+pydantic = "2.7.1"
+tqdm = "4.65.0"
