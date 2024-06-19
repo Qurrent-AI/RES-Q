@@ -6,12 +6,12 @@
 RES-Q is a codebase editing benchmark consisting of 100 hand-crafted, compact natural language edit instructions.
 The task is to, given an edit instruction and a codebase, make an edit to the codebase that satisfies the instruction.
 
-RES-Q can be accessed via [🤗 Datasets](https://huggingface.co/docs/datasets/en/index) with the following code snippet:
+RES-Q can be accessed via [🤗 Datasets](https://huggingface.co/datasets/Qurrent/RES-Q) with the following code snippet:
 ```python
 from datasets import load_dataset
 dataset = load_dataset("Qurrent/RES-Q", split="test")
 ```
-In this repository, we provide a *Submission Environment* which evaluates the success of completed RES-Q tasks, given a unified diff patch file representing the edit. 
+In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
 
 ![Environment Diagram](assets/environment.png)
 
@@ -55,7 +55,7 @@ env = SubmissionEnv(
 )
 ```
 > **Note:**
-> The `temp_dir` argument specifies where the submission environment will store temporary files. If `persist` is set to `True`, the environment will persist the generated files for future use. Persisting generated files significantly speeds up future submissions (~5mins vs ~20s to process 100 submissions)
+> The `temp_dir` argument specifies where the submission environment will store temporary files. If `persist` is set to `True`, the environment will persist the generated files for future use. Persisting generated files significantly speeds up future submissions (~5mins vs ~20s to process 100 submissions).
 
 We can then step through the environment with a single `Submission`: 
 ```python
