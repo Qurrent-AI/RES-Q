@@ -9,7 +9,7 @@ The task is to, given an edit instruction and a codebase, make an edit to the co
 RES-Q can be accessed via [🤗 Datasets](https://huggingface.co/docs/datasets/en/index) with the following code snippet:
 ```python
 from datasets import load_dataset
-dataset = load_dataset("Qurrent/coder-eval", split="test")
+dataset = load_dataset("Qurrent/RES-Q", split="test")
 ```
 In this repository, we provide a *Submission Environment* which evaluates the success of completed RES-Q tasks, given a unified diff patch file representing the edit. 
 
@@ -24,7 +24,7 @@ Ensure you have `conda` installed on your system. If not, you can install it fro
 1. Clone the repository and move into its directory:
 
 ```bash
-git clone https://github.com/Qurrent-AI/coder-eval.git && cd coder-eval
+git clone https://github.com/Qurrent-AI/RES-Q.git && cd RES-Q
 ```
 
 2. Install the `pip` package:
@@ -41,15 +41,15 @@ We provide a simple python interface to interact with the RES-Q dataset and subm
 To build a submission environment, we must first instantiate a `RESQDataset`:
 ```python
 from datasets import load_dataset
-from coder_eval.dataset import RESQDataset
+from resq.dataset import RESQDataset
 
-hf_dataset = load_dataset("coder-eval", split="test")
+hf_dataset = load_dataset("Qurrent/RES-Q", split="test")
 dataset = RESQDataset(hf_dataset)
 ```
 
 Then, we can instantiate a `SubmissionEnv` with the dataset:  
 ```python
-from coder_eval.submission import SubmissionEnv
+from resq.submission import SubmissionEnv
 env = SubmissionEnv(
     dataset=dataset, temp_dir="temp/", persist=True
 )
@@ -59,7 +59,7 @@ env = SubmissionEnv(
 
 We can then step through the environment with a single `Submission`: 
 ```python
-from coder_eval.models import Submission, SubmissionResult
+from resq.models import Submission, SubmissionResult
 submission = Submission(id="0_0", patch=dataset["0_0"].solution_patch)
 result = env.step(submission=submission)
 ```
@@ -122,7 +122,7 @@ If `--env-temp-dir` is not provided, conda environments that match the pattern `
 
 
 ## ️ Downloads
-The RES-Q benchmark dataset can be found on HuggingFace: [https://huggingface.co/datasets/qurrent/codereval](https://huggingface.co/datasets/qurrent/codereval)
+The RES-Q benchmark dataset can be found on HuggingFace: [https://huggingface.co/datasets/Qurrent/RES-Q](https://huggingface.co/datasets/Qurrent/RES-Q)
 
 ## ️ Citation
 If you find our work helpful, please use the following citation.
