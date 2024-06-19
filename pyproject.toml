@@ -14,7 +14,7 @@ strict = true
 namespace_packages = true
 ignore_missing_imports = true
 files = [
-    "coder_eval/",
+    "resq/",
 ]
 exclude = [
     "env/",

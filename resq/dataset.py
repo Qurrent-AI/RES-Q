@@ -9,7 +9,7 @@ from .models import RESQDataPoint
 
 
 class RESQDataset:
-    HF_NAME = "coder_eval"
+    HF_NAME = "RES-Q"
     HF_SPLIT = "test"
     """
     Represents the RES-Q dataset
