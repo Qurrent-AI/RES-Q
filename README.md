@@ -89,7 +89,7 @@ submissions = [
     Submission(id=entry_id, patch=entry.solution_patch) for entry in dataset
     ]
 
-results = env.step_batch(submissions=submissions, n_workers=4)
+results = env.step_batch(submissions=submissions, n_workers=4, pbar=True)
 ```
 ```python
 >>> results
