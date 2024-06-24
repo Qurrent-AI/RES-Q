@@ -15,6 +15,20 @@ In this repository, we provide a **Submission Environment** which serves as an e
 
 ![Environment Diagram](assets/environment.png)
 
+## Leaderboard
+
+| Rank | System | RES-Q Score (pass@1) |
+|------|--------|----------------------|
+| 1    | Qurrent OS + Claude 3.5 Sonnet | 58 |
+| 2    | Qurrent OS + GPT-4o | 46 |
+| 3    | Qurrent OS + GPT-4T | 37 |
+| 4    | Qurrent OS + Claude 3 Opus | 36 |
+| 5    | Qurrent OS + GPT-4 | 30 |
+| 5    | Qurrent OS + Gemini 1.5 Pro | 30 |
+| 7    | Qurrent OS + DeepSeek Coder V2 Instruct | 26 |
+| 8    | Qurrent OS + Llama 3 70b | 20 |
+| 9    | Qurrent OS + Qwen2-72B Instruct | 16 |
+
 
 ##  Set Up
 
