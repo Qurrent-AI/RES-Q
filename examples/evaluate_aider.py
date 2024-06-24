@@ -78,7 +78,7 @@ if __name__ == "__main__":
         sub = Submission(id=entry.id, patch=patch)
         submissions.append(sub)
 
-    results = env.step_batch(submissions, n_workers=4)
+    results = env.step_batch(submissions, n_workers=4, pbar=True)
 
     with open(results_dir, "w") as f:
         json.dump([o.model_dump() for o in results], f)
