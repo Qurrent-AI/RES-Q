@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import List
 from pydantic import BaseModel
 
 
@@ -22,10 +22,15 @@ class SubmissionResult(BaseModel):
     test_suite_feedback: str
 
 
+
 class RESQDataPoint(BaseModel):
     """
     Model for one entry in the RESQDataset
     """
+
+    class ModifiedFile(BaseModel):
+        path: str
+        content: str
 
     id: str
     repo_url: str
@@ -36,5 +41,5 @@ class RESQDataPoint(BaseModel):
     requirements_txt: str
     solution_commit: str
     solution_patch: str
-    modified_files: Dict[str, str]
+    modified_files: List[ModifiedFile]
     language: str
