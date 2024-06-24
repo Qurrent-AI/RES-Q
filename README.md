@@ -1,6 +1,6 @@
 # RES-Q
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 
 ## Overview
 RES-Q is a codebase editing benchmark consisting of 100 hand-crafted, compact natural language edit instructions.
@@ -19,16 +19,16 @@ In this repository, we provide a **Submission Environment** which serves as an e
 
 | Rank | System | RES-Q Score (% pass@1) |
 |------|--------|----------------------|
-| 1    | Qurrent OS + Claude 3.5 Sonnet | 58 |
-| 2    | Qurrent OS + GPT-4o | 46 |
-| 3    | Qurrent OS + GPT-4T | 37 |
-| 4    | Qurrent OS + Claude 3 Opus | 36 |
-| 5    | Qurrent OS + GPT-4 | 30 |
-| 5    | Qurrent OS + Gemini 1.5 Pro | 30 |
-| 7    | Qurrent OS + DeepSeek Coder V2 Instruct | 26 |
-| 8    | Qurrent OS + Llama 3 70b | 20 |
-| 9    | Qurrent OS + Qwen2-72B Instruct | 16 |
-| 10    | AutoGPT | 0 |
+| 1    | QurrentOS-coder + Claude 3.5 Sonnet | 58 |
+| 2    | QurrentOS-coder + GPT-4o | 46 |
+| 3    | QurrentOS-coder + GPT-4T | 37 |
+| 4    | QurrentOS-coder + Claude 3 Opus | 36 |
+| 5    | QurrentOS-coder + GPT-4 | 30 |
+| 5    | QurrentOS-coder + Gemini 1.5 Pro | 30 |
+| 7    | QurrentOS-coder + DeepSeek Coder V2 Instruct | 26 |
+| 8    | QurrentOS-coder + Llama 3 70b | 20 |
+| 9    | QurrentOS-coder + Qwen2-72B Instruct | 16 |
+| 10    |  |  |
 
 
 ##  Set Up
