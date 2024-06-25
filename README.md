@@ -18,6 +18,7 @@ In this repository, we provide a **Submission Environment** which serves as an e
 <p align="center">
   <img src="assets/environment.png" width="600px" alt="diagram">
 </p>
+</div>
 
 
 
