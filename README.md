@@ -14,9 +14,10 @@ dataset = load_dataset("Qurrent/RES-Q", split="test")
 ```
 In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
 
-<div style="text-align: center;">
-    <img src="assets/environment.png" alt="Environment Diagram" width="550"> <!-- Adjust the width as needed -->
-</div>
+<div align="center">
+<p align="center">
+  <img src="assets/environment.png" width="300px" alt="diagram">
+</p>
 
 
 
