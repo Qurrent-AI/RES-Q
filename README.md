@@ -30,6 +30,8 @@ In this repository, we provide a **Submission Environment** which serves as an e
 | 9    | QurrentOS-coder + Qwen2-72B Instruct | 16 |
 | 10    |  |  |
 
+> **Contribute to the Leaderboard**: If you've achieved results that could make it to our top 10 leaderboard, we'd love to hear from you. Please open a GitHub issue titled "Leaderboard Update Request" with your system name, score, approach, and run logs. 
+
 
 ##  Set Up
 
