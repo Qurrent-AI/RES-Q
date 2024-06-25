@@ -141,19 +141,6 @@ If `--env-temp-dir` is not provided, conda environments that match the pattern `
 ## ️ Downloads
 The RES-Q benchmark dataset can be found on HuggingFace: [https://huggingface.co/datasets/Qurrent/RES-Q](https://huggingface.co/datasets/Qurrent/RES-Q)
 
-## ️ Citation
-If you find our work helpful, please use the following citation.
-
-```
-@inproceedings{
-    qurrent2024resq,
-    title={{RES-Q: Evaluating the Capability of Language Models in Large-Scale Software Development},
-    author={Qurrent, Qurrent},
-    booktitle={arxiv},
-    year={2024},
-    url={https://arxiv.org/...}
-}}
-```
 
 ## License
 MIT. Check `LICENSE.md`.
