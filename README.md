@@ -1,6 +1,7 @@
 # RES-Q
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![arXiv](https://img.shields.io/badge/arXiv-2406.16801-b31b1b.svg)](https://arxiv.org/abs/2406.16801) [![RES-Q on HuggingFace datasets](https://img.shields.io/badge/%F0%9F%A4%97%20Datasets-RES--Q-yellow?style=flat)](https://huggingface.co/datasets/Qurrent/RES-Q)
 
 ## Overview
 RES-Q is a codebase editing benchmark consisting of 100 hand-crafted, compact natural language edit instructions.
@@ -13,7 +14,13 @@ dataset = load_dataset("Qurrent/RES-Q", split="test")
 ```
 In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
 
-![Environment Diagram](assets/environment.png)
+<div align="center">
+<p align="center">
+  <img src="assets/environment.png" width="600px" alt="diagram">
+</p>
+</div>
+
+
 
 ## Top 10 Leaderboard
 
@@ -140,6 +147,21 @@ If `--env-temp-dir` is not provided, conda environments that match the pattern `
 
 ## ️ Downloads
 The RES-Q benchmark dataset can be found on HuggingFace: [https://huggingface.co/datasets/Qurrent/RES-Q](https://huggingface.co/datasets/Qurrent/RES-Q)
+
+
+## ️ Citation
+If you find our work helpful, please use the following citation.
+
+```
+@misc{labash2024resq,
+      title={RES-Q: Evaluating Code-Editing Large Language Model Systems at the Repository Scale}, 
+      author={Beck LaBash and August Rosedale and Alex Reents and Colin Wiel},
+      year={2024},
+      eprint={2406.16801},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
 
 
 ## License
