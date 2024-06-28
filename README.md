@@ -12,15 +12,6 @@ RES-Q can be accessed via [🤗 Datasets](https://huggingface.co/datasets/Qurren
 from datasets import load_dataset
 dataset = load_dataset("Qurrent/RES-Q", split="test")
 ```
-In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
-
-<div align="center">
-<p align="center">
-  <img src="assets/environment.png" width="600px" alt="diagram">
-</p>
-</div>
-
-
 
 ## Top 10 Leaderboard
 
@@ -38,6 +29,14 @@ In this repository, we provide a **Submission Environment** which serves as an e
 | 10    |  |  |
 
 > **Contribute to the Leaderboard**: If you've achieved results that could make it to our top 10 leaderboard, we'd love to hear from you. Please open a GitHub issue titled "Leaderboard Update Request" with your system name, score, approach, and run logs. 
+
+In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
+
+<div align="center">
+<p align="center">
+  <img src="assets/environment.png" width="600px" alt="diagram">
+</p>
+</div>
 
 
 ##  Set Up
@@ -155,7 +154,7 @@ If you find our work helpful, please use the following citation.
 ```
 @misc{labash2024resq,
       title={RES-Q: Evaluating Code-Editing Large Language Model Systems at the Repository Scale}, 
-      author={Beck LaBash and August Rosedale and Alex Reents and Colin Wiel},
+      author={Beck LaBash and August Rosedale and Alex Reents and Lucas Negritto and Colin Wiel},
       year={2024},
       eprint={2406.16801},
       archivePrefix={arXiv},
