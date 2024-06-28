@@ -30,6 +30,8 @@ dataset = load_dataset("Qurrent/RES-Q", split="test")
 
 > **Contribute to the Leaderboard**: If you've achieved results that could make it to our top 10 leaderboard, we'd love to hear from you. Please open a GitHub issue titled "Leaderboard Update Request" with your system name, score, approach, and run logs. 
 
+## Submission Environment
+
 In this repository, we provide a **Submission Environment** which serves as an evaluator for completed RES-Q tasks. Given a unified diff patch file representing a codebase edit, the environment produces detailed feedback about the success of the edit with respect to the task instruction.
 
 <div align="center">
