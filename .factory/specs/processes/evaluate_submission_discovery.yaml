@@ -1,0 +1,141 @@
+business_overview: An external code-editing system submits a candidate patch for a RES-Q task. The evaluator looks up the
+  task, restores the target repository to its base commit, applies the patch, runs the task's test script in an isolated Python
+  environment, and returns one of PASS, FAIL, PATCH FAILED, or TIMED OUT — along with diagnostic feedback for non-passing
+  results — so that the submission can be scored against the benchmark.
+decision_logic: |-
+  **Trigger:** A submission arrives — either programmatically through the evaluator's single-step or batch entrypoint, or via the submission CLI invoked with a JSON file of submissions. Each submission carries an ID matching a benchmark task and a candidate patch in unified-diff format.
+
+  ## Context Gathering
+
+  Before evaluating, gather the following for the submission's task:
+
+  - The repository URL and the starting commit that defines the codebase state before the edit
+  - The natural-language edit instruction (kept for reference only — the evaluator does not interpret it)
+  - The required Python version for the testbed
+  - The list of Python package dependencies the task needs installed
+  - The test script whose exit code determines pass or fail
+  - The task language (currently only Python is fully supported)
+
+  Task data is loaded from a RES-Q dataset object, which is sourced either from a local JSON file or from the HuggingFace Datasets distribution of the Qurrent RES-Q test split.
+
+  ## Patch Application
+
+  Restore the target repository to a clean state at the starting commit using the Git Remote integration:
+
+  - Clone the repository (or reuse a persisted clone) into a per-task workspace under the evaluator's working directory
+  - Hard reset to the starting commit and remove any leftover artifacts
+  - Strip binary-file sections from the submitted patch (the evaluator only scores text edits)
+
+  Then attempt to apply the patch:
+
+  ### If the patch is empty
+
+  - Result: PATCH FAILED with feedback "Empty patch". Skip the rest of the flow.
+
+  ### If the patch fails to apply
+
+  - Result: PATCH FAILED with the apply error output as feedback so the submitter can diagnose the conflict. Skip the rest of the flow.
+
+  ### Otherwise
+
+  - Proceed to environment setup.
+
+  ## Test Execution
+
+  Set up the testbed:
+
+  - Create a Python environment via the Conda integration for the task's required Python version (or reuse a persisted one keyed by task ID when the evaluator is configured to persist artifacts)
+  - Install the task's Python package dependencies into that environment using the pip integration
+  - Generate a fresh per-run secret token and inject it as a print statement immediately before the first early-exit line of the test script, then write the modified script into the repo under a random filename
+
+  Run the test script inside the task's repo directory, bounded by the configured timeout.
+
+  ### Classify the run
+
+  - **PASS** — the process exited with code 0 AND the injected secret was printed to standard output. This prevents an edit that calls an early-exit-zero before the real assertions from being credited as a pass.
+  - **TIMED OUT** — execution exceeded the configured timeout; the process is killed and feedback is empty.
+  - **FAIL** — exit code is non-zero, or the secret was absent. Feedback is the concatenation of standard output and standard error from the test run so the submitter can debug.
+
+  ## Result Reporting
+
+  Return a submission result containing the submission ID, a boolean success flag, a status message (PASS, FAIL, PATCH FAILED, or TIMED OUT), and test suite feedback (apply errors for patch failures, test output for test failures, empty for passes and timeouts).
+
+  When a batch is submitted, the same per-submission flow runs inside an async worker pool of configurable size, and results are collected into a list.
+
+  ## Cleanup
+
+  When the evaluator is configured not to persist artifacts, the per-task workspace and Python environment are removed after the run. When it is configured to persist them, both are retained and indexed in a local registry so subsequent runs of the same task skip clone, environment creation, and dependency install — turning a cold batch of the 100-task benchmark from roughly five minutes into roughly twenty seconds.
+
+  ## Error Handling
+
+  - Submission ID not present in the dataset → dataset lookup raises an error and the run aborts (no submission result is produced for that submission).
+  - Patch contains binary-file sections → binary sections are filtered out before apply; remaining text edits are still applied.
+  - JavaScript tasks → the current testbed has Python-specific environment setup; JS support exists only as a stub and is treated as out of scope.
+identifiers:
+- Submission ID — caller-provided identifier on each submission, e.g. '0_0'
+- Task ID — the RES-Q benchmark task identifier; used as the key for workspace persistence and the Python environment registry
+  (and equal to the Submission ID when callers follow the standard convention)
+metrics:
+- Count of submissions by result status (PASS, FAIL, PATCH FAILED, TIMED OUT) / batch
+- Pass rate (percent of submissions with PASS) / batch
+- Total elapsed time per batch
+- Count of submissions that hit the execution timeout / batch
+- Count of cache hits (reused workspace or persisted Python environment) / batch
+- Average evaluation time per submission broken down by cold vs. warm cache / batch
+name: evaluate_submission
+out_of_scope:
+- Generating the candidate patch. RES-Q is an evaluator; producing the edit is the job of the external code-editing system
+  being benchmarked (e.g. aider, QurrentOS-coder).
+- Languages other than Python. A JavaScript testbed class exists but has no environment setup logic implemented.
+- Training, fine-tuning, or prompt-engineering models against the benchmark.
+- Interpreting or grading the natural-language edit instruction — the test script alone determines pass or fail.
+- Evaluating patches against repository states other than the task's starting commit.
+- Bulk cleanup of persisted Python environments left behind by prior batches — that is a separate operational utility, not
+  part of the per-submission evaluation flow.
+test_cases:
+- expected: PASS
+  input: Submission patch that correctly satisfies the task instruction, applies cleanly to the starting commit, and causes
+    the test script to exit with code 0 with the injected secret printed.
+  rationale: Exit code 0 and the injected secret in standard output — both conditions for PASS per the Test Execution / Classify
+    the run rule.
+- expected: FAIL
+  input: Submission patch that applies cleanly but does not correctly implement the instruction; the test script exits with
+    a non-zero code.
+  rationale: Non-zero exit code triggers FAIL classification, with combined standard output and standard error returned as
+    feedback.
+- expected: PATCH FAILED
+  input: Submission patch whose hunks no longer match the file at the starting commit, so the apply step fails.
+  rationale: Patch apply failure short-circuits the flow and returns PATCH FAILED with the apply error output as feedback.
+- expected: PATCH FAILED
+  input: Submission with an empty patch string.
+  rationale: Empty-patch branch returns PATCH FAILED with feedback "Empty patch" before any test execution is attempted.
+- expected: TIMED OUT
+  input: Submission whose test script runs longer than the evaluator's configured timeout (e.g. an infinite loop introduced
+    by the edit).
+  rationale: Execution exceeds the timeout, the process is killed, and the result is classified TIMED OUT per the Test Execution
+    / Classify the run rule.
+- expected: FAIL
+  input: Submission patch that inserts an early exit zero at the top of the test script in an attempt to fake a pass without
+    running the real assertions.
+  rationale: Although exit code is 0, the injected secret is not printed because the early exit fires before the print statement
+    is reached. The PASS conjunction (exit 0 AND secret printed) is not satisfied, so per the Classify the run rule the result
+    is FAIL.
+- expected: PASS
+  input: Submission patch that includes a binary-file change (e.g. an updated image) alongside legitimate text edits that
+    satisfy the instruction.
+  rationale: The binary-file section is stripped from the patch before apply, so the text edits proceed normally; the test
+    script then exits with code 0 with the injected secret printed.
+- expected: Dataset lookup error; no submission result produced
+  input: Submission whose ID does not correspond to any task in the loaded dataset.
+  rationale: Dataset lookup raises an error when the ID is unknown, per the Error Handling rule.
+- expected: PATCH FAILED
+  input: Submission patch that contains only binary-file sections and no text edits (so the entire patch is stripped during
+    filtering).
+  rationale: Binary-section filtering removes all hunks, leaving an empty patch; the Empty patch branch then returns PATCH
+    FAILED with feedback "Empty patch".
+- expected: Both submissions receive independent, isolated results (no cross-contamination of workspace files, Python environment,
+    or test script secret)
+  input: Batch of two submissions sharing the same task ID processed concurrently by separate workers in the async pool.
+  rationale: The Concurrent Access Safety guardrail uses async locks on the per-task workspace and the environment registry
+    so parallel workers do not corrupt shared on-disk state.
+title: Code-Editing Patch Evaluation

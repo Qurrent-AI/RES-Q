@@ -1,0 +1,50 @@
+workforce: RES-Q Benchmark Evaluator
+overview: >-
+  An evaluation environment for the RES-Q code-editing benchmark. It receives
+  candidate patches produced by AI code-editing systems, applies each patch to
+  the target repository at a known commit, runs the task's test suite in an
+  isolated environment, and reports a pass/fail result that can be aggregated
+  into a leaderboard score.
+integrations:
+- name: Git Remote
+  description: >-
+    Source for cloning target repositories and applying patches. Each
+    benchmark task points to a public Git repository URL and a specific base
+    commit that defines the starting state of the codebase before the edit.
+- name: Conda
+  description: >-
+    Per-task Python environment management. A fresh conda environment is
+    created for each task using the task's specified Python version so that
+    dependencies do not leak between submissions.
+- name: pip
+  description: >-
+    Installs each task's Python package dependencies into its conda
+    environment before the test script runs.
+- name: HuggingFace Datasets
+  description: >-
+    Distribution channel for the RES-Q benchmark dataset (the "Qurrent/RES-Q"
+    test split). The evaluator loads task entries — instruction, repo URL,
+    base commit, test script, and required environment — from this source.
+guardrails:
+- name: Submission Isolation
+  description: >-
+    Each submission is evaluated in its own temporary working directory and
+    its own conda environment so that one submission's changes, installs, or
+    side effects cannot affect another submission's result.
+- name: Test Integrity
+  description: >-
+    A per-run secret token is injected into the test script before any
+    early-exit line, and the test is only considered to have passed if
+    that secret appears in standard output. This prevents an edit from
+    faking a pass by triggering an early-exit-zero before the real
+    assertions run.
+- name: Execution Timeout
+  description: >-
+    Test execution is bounded by a configurable timeout. A run that exceeds
+    the timeout is killed and reported as `TIMED OUT` rather than blocking
+    the evaluator indefinitely.
+- name: Concurrent Access Safety
+  description: >-
+    Shared on-disk state — the per-task workspace and the conda environment
+    registry — is protected by async locks so that parallel workers
+    processing a submission batch cannot corrupt each other's files.

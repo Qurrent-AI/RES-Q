@@ -1,0 +1,119 @@
+agents:
+- name: Submission Evaluator
+  description: >-
+    Evaluate a candidate patch against a RES-Q task and return a PASS, FAIL,
+    PATCH FAILED, or TIMED OUT result.
+  observables:
+  - name: apply_submission_patch
+    description: >-
+      Acquire an isolated clone of the task's repository at its starting
+      commit and attempt to apply the submitted patch — short-circuiting
+      to a PATCH FAILED result if the patch is empty (including
+      binary-only patches stripped to nothing) or if the apply step
+      fails.
+  - name: setup_testbed
+    description: >-
+      Create (or reuse, when persistence is enabled) the task's Python
+      environment at the required Python version via the Conda
+      integration and install the task's package dependencies via the
+      pip integration.
+  - name: run_and_classify
+    description: >-
+      Inject the integrity secret into the test script, execute it
+      inside the task's environment under the configured timeout,
+      classify the outcome as PASS, FAIL, or TIMED OUT, and return the
+      submission result with status message and any diagnostic
+      feedback.
+  technical_agents: []
+overview:
+  technical: |
+    ## Execution Flow
+
+    A submission enters through the evaluator's single-step or batch
+    entrypoint. The batch path runs the same per-submission flow inside an
+    async worker pool of configurable size. The submission's task is
+    looked up in the loaded dataset (sourced from the HuggingFace Datasets
+    distribution of the Qurrent/RES-Q test split or a local JSON file)
+    and the deterministic pipeline below is awaited.
+
+    The pipeline is composed of three observables, each invoking the
+    relevant integrations and applying the appropriate guardrails:
+
+    1. **apply_submission_patch** uses the Git Remote integration to
+       clone or reuse the task's repository under a per-task workspace,
+       hard-reset to the starting commit, and clean leftover artifacts.
+       The submitted patch is filtered to remove binary-file sections,
+       then applied to the working tree. An empty patch (including a
+       binary-only patch reduced to nothing by the filter) returns
+       PATCH FAILED with feedback "Empty patch"; an apply failure
+       returns PATCH FAILED carrying the apply error output.
+    2. **setup_testbed** uses the Conda integration to create a fresh
+       Python environment at the task's required version, then the pip
+       integration to install the task's package dependencies. When the
+       evaluator is configured to persist artifacts, the environment is
+       indexed in a local registry keyed by task ID so subsequent runs
+       of the same task skip clone, environment creation, and dependency
+       install.
+    3. **run_and_classify** generates a per-run secret token (the Test
+       Integrity guardrail) and injects it as a print statement before
+       the first early-exit line of the test script; the script is then
+       executed inside the task's environment, bounded by the configured
+       timeout (the Execution Timeout guardrail). The result is PASS only
+       when the process exited with code 0 AND the injected secret
+       appeared in standard output; otherwise it is FAIL (with combined
+       standard output and standard error returned as feedback) or
+       TIMED OUT (when the timeout was exceeded). Finally the submission
+       result is constructed and returned.
+
+    ## Design Decisions
+
+    Every step is deterministic code, so no technical (LLM) agents are
+    defined. The evaluator's job is to faithfully execute the task's
+    test script against a patched checkout — judgment is delegated
+    entirely to the task author's test script, not to an LLM in this
+    workflow.
+
+    Per-run secret injection is the only protection against a submission
+    patch that calls an early-exit-zero before the assertions run.
+    Because the secret is generated fresh per run and is required to
+    appear in standard output, an edit cannot statically pre-bake a
+    known marker into the test script.
+
+    The persisted environment registry is what enables the cold-vs-warm
+    speedup that turns a cold batch of the 100-task benchmark from
+    roughly five minutes into roughly twenty seconds on a warm rerun.
+    Async locks (the Concurrent Access Safety guardrail) serialize
+    concurrent reads and writes per file so the worker pool in the
+    batch entrypoint can scale without corrupting the registry or the
+    per-task workspace.
+
+    Binary-file sections of the patch are filtered out before apply
+    because the apply step is invoked with text-only assumptions; the
+    evaluator's correctness scope is text edits scored by the test
+    script (the Submission Isolation guardrail keeps each evaluation
+    in its own workspace and environment).
+
+    ## Error Handling
+
+    Dataset lookup raises when the submission's ID is not present in
+    the loaded dataset; the run aborts for that submission (no
+    submission result is produced).
+
+    Patch-apply failures, empty patches, non-zero test exits, and
+    timeouts each map to specific submission-result shapes so a
+    downstream scorer can distinguish failure modes.
+
+    Environment teardown is unconditional when persistence is disabled;
+    when the environment was never created (early failure), teardown
+    is a no-op.
+guardrails:
+- Submission Isolation
+- Test Integrity
+- Execution Timeout
+- Concurrent Access Safety
+integrations:
+- Git Remote
+- Conda
+- pip
+- HuggingFace Datasets
+technical_agents: []

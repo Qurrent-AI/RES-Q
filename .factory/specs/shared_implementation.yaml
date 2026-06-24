@@ -1,0 +1,30 @@
+integrations:
+  Git Remote:
+    type: custom
+    location: resq/git/repository.py
+    config_keys: []
+    methods:
+    - clone
+    - reset
+    - apply_patch
+  Conda:
+    type: custom
+    location: resq/testbeds/base.py
+    config_keys: []
+    methods:
+    - create_env
+    - remove_env
+    - run_in_env
+  pip:
+    type: custom
+    location: resq/testbeds/python.py
+    config_keys: []
+    methods:
+    - install_requirements
+  HuggingFace Datasets:
+    type: custom
+    location: resq/dataset.py
+    config_keys: []
+    methods:
+    - load_dataset
+technical_agents: []
